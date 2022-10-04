@@ -47,8 +47,13 @@ app.get("/tools", (req, res) => {
     console.log(req.session.id);
 });
 
+// app.post("/trigger", (req, res) => {
+
+//     res.status(200).send()
+// });
+
 app.post("/submit", (req, res) => {
-    console.log(req.session.id);
+    console.log(req.session.id); // TODO this should be sent to a game manager that is retrieved from a factory!
     if (unitySocket) {
         console.log("submitting new map");
         unitySocket.emit("ping");
