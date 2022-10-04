@@ -28,7 +28,11 @@ const tools = {
             colour: "red"
         },
         dimensions: { width: 1, height: 1 },
-        draggable: true
+        draggable: true,
+        interaction: {
+            frequency: 2,
+            duration: 2
+        }
     },
     Bed: {
         tileStyle: {
