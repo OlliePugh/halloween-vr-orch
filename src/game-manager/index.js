@@ -1,4 +1,4 @@
-import { ERROR_MESSAGES } from "../consts";
+import { ERRORS } from "../consts";
 import SOCKET_EVENTS from "../SOCKET_EVENTS";
 import tools from "../tools";
 
@@ -18,15 +18,16 @@ class GameManager {
             if (this.unitySocket) {
                 this.unitySocket.emit(SOCKET_EVENTS.MAP_UPDATE, map);
             } else {
-                throw Error(ERROR_MESSAGES.NO_UNITY_CLIENT);
+                throw Error(ERRORS.NO_UNITY_CLIENT);
             }
         } catch (e) {
             console.log(`Could not send message to unity ${e.message}`);
-            throw Error(ERROR_MESSAGES.NO_UNITY_CLIENT);
+            throw Error(ERRORS.NO_UNITY_CLIENT);
         }
 
         map.forEach((col, colNum) => {
             col.forEach((tile, rowNum) => {
+                if (!tile) return;
                 try {
                     const tileType = tools[tile?.type.key];
                     if (tileType.interaction) {

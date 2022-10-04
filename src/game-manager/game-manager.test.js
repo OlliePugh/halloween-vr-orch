@@ -1,5 +1,5 @@
 import GameManager from ".";
-import { ERROR_MESSAGES } from "../consts";
+import { ERRORS } from "../consts";
 import SOCKET_EVENTS from "../SOCKET_EVENTS";
 
 jest.useFakeTimers();
@@ -132,9 +132,7 @@ describe("GameManager", () => {
                 ]
             ];
 
-            expect(() => sut.setMap(fakeMap)).toThrow(
-                ERROR_MESSAGES.NO_UNITY_CLIENT
-            );
+            expect(() => sut.setMap(fakeMap)).toThrow(ERRORS.NO_UNITY_CLIENT);
         });
 
         it("Should throw NO_UNITY_CLIENT if emit throws an error", () => {
@@ -157,9 +155,7 @@ describe("GameManager", () => {
                 ]
             ];
 
-            expect(() => sut.setMap(fakeMap)).toThrow(
-                ERROR_MESSAGES.NO_UNITY_CLIENT
-            );
+            expect(() => sut.setMap(fakeMap)).toThrow(ERRORS.NO_UNITY_CLIENT);
         });
     });
 

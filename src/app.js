@@ -1,66 +1,43 @@
-import express from "express";
-import tools from "./tools";
-import cors from "cors";
-import { Server } from "socket.io";
-import http from "http";
-import SOCKET_EVENTS from "./SOCKET_EVENTS";
 import secrets from "./secrets";
-import session from "express-session";
+import express from "express";
+import Factory from "./factory";
+import http from "http";
+import socketHandler from "./socket-events";
+import routing from "./routing";
+import { getClientIdFromSocket } from "./utils";
+import { Server } from "socket.io";
 
 const app = express();
-app.set("trust proxy", 1); // trust first proxy
-app.use(
-    session({
-        secret: secrets.sessionSecret, // this will be replaced in the future
-        resave: false,
-        saveUninitialized: true,
-        domain: "dev.olliepugh.com"
-        // cookie: { sameSite: "none" }
-    })
-);
 const server = http.createServer(app);
-const io = new Server(server);
-let unitySocket;
+const session = {};
 
-app.use(
-    cors({
+app.set("trust proxy", 1); // trust first proxy
+
+const gameManager = Factory.createGameManager();
+const io = new Server(server, {
+    cors: {
         origin: "http://dev.olliepugh.com:3000",
-        credentials: true,
-        optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-    })
-);
-app.use(express.json());
+        methods: ["GET", "POST"],
+        allowedHeaders: ["connect.sid"],
+        credentials: true
+    }
+});
 
 io.on("connection", (socket) => {
     if (socket.handshake.query?.token === secrets.unityKey) {
-        unitySocket = socket;
-        console.log("Unity Client");
+        gameManager.setUnitySocket(socket);
+        console.log("Unity Client Connected");
+    } else {
+        try {
+            socketHandler(socket, session, gameManager); // add the events to the socket
+        } catch {
+            // user should not be creating a socket without a client id
+            socket.disconnect();
+        }
     }
 });
 
-app.get("/", (req, res) => {
-    res.send("Hello World");
-});
-
-app.get("/tools", (req, res) => {
-    res.send(tools);
-    console.log(req.session.id);
-});
-
-// app.post("/trigger", (req, res) => {
-
-//     res.status(200).send()
-// });
-
-app.post("/submit", (req, res) => {
-    console.log(req.session.id); // TODO this should be sent to a game manager that is retrieved from a factory!
-    if (unitySocket) {
-        console.log("submitting new map");
-        unitySocket.emit("ping");
-        unitySocket.emit(SOCKET_EVENTS.MAP_UPDATE, req.body);
-    }
-    res.status(200).send();
-});
+routing(app, gameManager, session);
 
 server.listen(8080, () => {
     console.log("HTTP Listening");
