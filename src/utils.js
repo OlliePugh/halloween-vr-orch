@@ -23,3 +23,7 @@ export const getClientIdFromSocket = (socket) => {
 export const createClientId = () => {
     return uuidv4();
 };
+
+export const createNewSession = async (redisClient, clientId) => {
+    await redisClient.json.set(clientId, `$`, {}, { NX: true }); // only set if doesnt exist
+};

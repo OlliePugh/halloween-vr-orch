@@ -6,7 +6,11 @@ class GameManager {
     unitySocket;
     currentMap = {};
 
-    constructor() {}
+    redisClient;
+
+    constructor(redisClient) {
+        this.redisClient = redisClient;
+    }
 
     setUnitySocket(unitySocket) {
         this.unitySocket = unitySocket;
@@ -56,6 +60,7 @@ class GameManager {
                     .split(",")
                     .map((value) => parseInt(value));
                 try {
+                    console.log("triggered tile");
                     this.unitySocket.emit(
                         SOCKET_EVENTS.TRIGGER_EVENT,
                         splitIdentifier

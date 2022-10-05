@@ -1,11 +1,15 @@
-import { createClientId, getClientIdFromRequest } from "./utils";
+import {
+    createClientId,
+    createNewSession,
+    getClientIdFromRequest
+} from "./utils";
 import consts from "./consts";
 import cookies from "cookie-parser";
 import tools from "./tools";
 import cors from "cors";
 import express from "express";
 
-export default (app, gameManager, session) => {
+export default (app, gameManager, redisClient) => {
     app.use(cookies());
     app.use(
         cors({
@@ -15,20 +19,17 @@ export default (app, gameManager, session) => {
         })
     );
     app.use(express.json());
-    app.use((req, res, next) => {
+    app.use(async (req, res, next) => {
         try {
             const clientId = getClientIdFromRequest(req);
-            if (!session[clientId]) {
-                // if the cookie exists but the session doesnt
-                session[clientId] = { sockets: [] };
-            }
+            createNewSession(redisClient, clientId);
         } catch (e) {
             // will throw if a client Id cannot be found
             const clientId = createClientId();
             res.cookie(consts.CLIENT_COOKIE_KEY, clientId, {
                 maxAge: 86400 * 1000
             });
-            session[clientId] = { sockets: [] }; // create a new session
+            createNewSession(redisClient, clientId);
         }
         next();
     });
@@ -41,10 +42,10 @@ export default (app, gameManager, session) => {
         res.send(tools);
     });
 
-    app.post("/submit", (req, res) => {
+    app.post("/submit", async (req, res) => {
         try {
-            const clientId = getClientIdFromRequest(req); // TODO replace this with redis maybe
-            session[clientId].isInGame = true;
+            const clientId = getClientIdFromRequest(req);
+            await redisClient.json.set(clientId, `$.isInGame`, true);
         } catch (e) {
             console.log(e);
             res.status(403).send();
