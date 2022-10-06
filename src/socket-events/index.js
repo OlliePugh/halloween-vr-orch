@@ -32,9 +32,7 @@ const socketHandler = async (socket, redisClient, gameManager) => {
         });
     });
 
-    socket.on("disconnect", async () => {
-        console.log("socket disconnected");
-    });
+    socket.on("disconnect", async () => {});
 };
 
 const socketHandshakeSetup = (io, socket, redisClient, gameManager) => {
