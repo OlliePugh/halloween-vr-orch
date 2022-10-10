@@ -72,7 +72,13 @@ class GameManager {
             }
             tile.triggerable = false;
             setTimeout(() => {
-                this.currentMap[identifier].triggerable = true; // set back to triggerable
+                try {
+                    this.currentMap[identifier].triggerable = true; // set back to triggerable
+                } catch (e) {
+                    console.log(
+                        `Could not set tile back to triggerable ${e.message}`
+                    );
+                }
             }, tile.frequency * 1000);
         } else {
             console.log("Tile is not triggerable");

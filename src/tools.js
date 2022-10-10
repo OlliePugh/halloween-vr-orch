@@ -16,11 +16,11 @@ const tools = {
         dimensions: { width: 1, height: 1 },
         draggable: true
     },
-    Table: {
+    DiningTable: {
         tileStyle: {
             colour: "green"
         },
-        dimensions: { width: 2, height: 3 }
+        dimensions: { width: 2, height: 2 }
     },
     WallWithPainting: {
         name: "Wall With Painting",
@@ -32,6 +32,17 @@ const tools = {
         interaction: {
             frequency: 2,
             duration: 2
+        }
+    },
+    RockingChair: {
+        name: "Rocking Chair",
+        tileStyle: {
+            colour: "yellow"
+        },
+        dimensions: { width: 1, height: 1 },
+        interaction: {
+            frequency: 30,
+            duration: 5
         }
     },
     Bed: {
