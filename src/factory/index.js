@@ -1,5 +1,7 @@
 import GameManager from "../game-manager";
+import { ReadlineParser, SerialPort } from "serialport";
 import * as redis from "redis";
+import SerialHandler from "../serial-handler";
 
 class Factory {
     static instances = {};
@@ -32,6 +34,24 @@ class Factory {
 
         this.instances.redisClient = redisClient;
         return redisClient;
+    }
+
+    static createSerialHandler({ path, baudRate }, autoOpen = false) {
+        if (this.instances.serialHandler) {
+            // only ever create one instance
+            return this.instances.serialHandler;
+        }
+
+        const serialPort = new SerialPort({
+            path,
+            baudRate,
+            autoOpen: false
+        });
+        const parser = new ReadlineParser();
+        const serialHandler = new SerialHandler(autoOpen, serialPort, parser);
+
+        this.instances.serialHandler = serialHandler;
+        return serialHandler;
     }
 }
 

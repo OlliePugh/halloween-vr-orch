@@ -9,7 +9,7 @@ import tools from "./tools";
 import cors from "cors";
 import express from "express";
 
-export default (app, gameManager, redisClient) => {
+export default (app, gameManager, redisClient, serialHandler) => {
     app.use(cookies());
     app.use(
         cors({
@@ -40,6 +40,10 @@ export default (app, gameManager, redisClient) => {
 
     app.get("/tools", (req, res) => {
         res.send(tools);
+    });
+
+    app.get("/bpm", (req, res) => {
+        res.send(`${serialHandler.state.bpm}`);
     });
 
     app.post("/submit", async (req, res) => {

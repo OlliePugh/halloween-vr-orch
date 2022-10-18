@@ -5,6 +5,7 @@ import http from "http";
 import socketHandshakeSetup from "./socket-events";
 import routing from "./routing";
 import { Server } from "socket.io";
+import config from "./config";
 
 const app = express();
 const server = http.createServer(app);
@@ -30,9 +31,14 @@ io.on("connection", async (socket) => {
 });
 
 let redisClient;
+let serialHandler;
 
 server.listen(8080, async () => {
     redisClient = await Factory.createRedisClient();
-    routing(app, gameManager, redisClient);
+    serialHandler = Factory.createSerialHandler(
+        { path: config.port, baudRate: config.baudRate },
+        true
+    );
+    routing(app, gameManager, redisClient, serialHandler);
     console.log("HTTP Listening");
 });

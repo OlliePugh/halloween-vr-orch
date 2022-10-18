@@ -20,7 +20,8 @@ const tools = {
         tileStyle: {
             colour: "green"
         },
-        dimensions: { width: 2, height: 2 }
+        dimensions: { width: 2, height: 2 },
+        category: "Dining Room"
     },
     WallWithPainting: {
         name: "Wall With Painting",
@@ -49,21 +50,87 @@ const tools = {
         tileStyle: {
             colour: "blue"
         },
-        dimensions: { width: 1, height: 2 }
+        dimensions: { width: 1, height: 2 },
+        category: "Bedroom"
     },
     BedsideTable: {
         name: "Bedside Table",
         tileStyle: {
             colour: "yellow"
         },
-        dimensions: { width: 1, height: 1 }
+        dimensions: { width: 1, height: 1 },
+        category: "Bedroom"
     },
     Wardrobe: {
-        name: "Wardrobe",
         tileStyle: {
             colour: "cyan"
         },
-        dimensions: { width: 2, height: 1 }
+        dimensions: { width: 2, height: 1 },
+        category: "Bedroom"
+    },
+    TableWithLamp: {
+        name: "Table with Lamp",
+        tileStyle: {
+            colour: "green"
+        },
+        dimensions: { width: 1, height: 1 },
+        interaction: {
+            frequency: 30,
+            duration: 2
+        }
+    },
+    Fridge: {
+        tileStyle: {
+            colour: "cyan"
+        },
+        dimensions: { width: 1, height: 1 },
+        category: "Kitchen"
+    },
+    Oven: {
+        tileStyle: {
+            colour: "orange"
+        },
+        dimensions: { width: 1, height: 1 },
+        category: "Kitchen"
+    },
+    CoffeeTable: {
+        name: "Coffee Table",
+        tileStyle: {
+            colour: "brown",
+            textColour: "white"
+        },
+        dimensions: { width: 2, height: 1 },
+        category: "Living Room"
+    },
+    Bath: {
+        tileStyle: {
+            colour: "grey"
+        },
+        dimensions: { width: 4, height: 2 },
+        category: "Bathroom"
+    },
+    Sink: {
+        tileStyle: {
+            colour: "blue"
+        },
+        dimensions: { width: 2, height: 1 },
+        category: "Bathroom"
+    },
+    Toilet: {
+        tileStyle: {
+            colour: "brown",
+            textColour: "white"
+        },
+        dimensions: { width: 1, height: 1 },
+        category: "Bathroom"
+    },
+    Sofa: {
+        tileStyle: {
+            colour: "brown",
+            textColour: "white"
+        },
+        dimensions: { width: 4, height: 1 },
+        category: "Living Room"
     }
 };
 
