@@ -1,0 +1,20 @@
+const triggerableEvents = {
+    SpawnMonster: {
+        name: "Spawn Monster",
+        tileStyle: {
+            colour: "black",
+            textColour: "white"
+        },
+        requiresAssociatedTile: true,
+        duration: 30,
+        frequency: 30
+    },
+    DisableTorch: {
+        name: "Disable Torch",
+        requiresAssociatedTile: false,
+        duration: 15,
+        frequency: 2
+    }
+};
+
+export default triggerableEvents;

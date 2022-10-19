@@ -32,6 +32,19 @@ const socketHandler = async (socket, redisClient, gameManager) => {
         });
     });
 
+    socket.on(SOCKET_EVENTS.NONBLOCK_EVENT, (data) => {
+        requiresClientId(socket, data, true, async (clientId, data) => {
+            if (
+                await redisClient.json.get(clientId, {
+                    path: ["isInGame"]
+                })
+            ) {
+                console.log(data);
+                gameManager.triggerNonBlockEvent(data);
+            }
+        });
+    });
+
     socket.on("disconnect", async () => {});
 };
 

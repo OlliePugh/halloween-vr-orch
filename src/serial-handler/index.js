@@ -70,12 +70,13 @@ export default class SerialHandler {
 
     handleMessage(content) {
         let bpm = Number(content.split(",")[0]);
+
         if (isNaN(bpm)) {
             bpm = 100;
         }
 
         if (this.state.bpm != bpm) {
-            console.log(`Updating BPM to ${bpm}`);
+            //console.log(`Updating BPM to ${bpm}`);  TODO RE-ENABLE THIS
         }
 
         this.state.bpm = bpm;

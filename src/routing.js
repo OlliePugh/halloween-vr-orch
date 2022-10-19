@@ -6,6 +6,7 @@ import {
 import consts from "./consts";
 import cookies from "cookie-parser";
 import tools from "./tools";
+import events from "./game-events";
 import cors from "cors";
 import express from "express";
 
@@ -40,6 +41,10 @@ export default (app, gameManager, redisClient, serialHandler) => {
 
     app.get("/tools", (req, res) => {
         res.send(tools);
+    });
+
+    app.get("/events", (req, res) => {
+        res.send(events);
     });
 
     app.get("/bpm", (req, res) => {

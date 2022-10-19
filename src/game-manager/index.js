@@ -84,6 +84,16 @@ class GameManager {
             console.log("Tile is not triggerable");
         }
     }
+
+    triggerNonBlockEvent(data) {
+        // TODO check if the user is allowed to perform this (e.g. is there still a cooldown taking place)
+        try {
+            this.unitySocket.emit(SOCKET_EVENTS.NONBLOCK_EVENT, data);
+        } catch (e) {
+            console.log(e.message);
+            console.log("Failed to emit event to unity client");
+        }
+    }
 }
 
 export default GameManager;
