@@ -6,7 +6,7 @@ import Queue from "../queue";
 
 class GameManager {
     unitySocket;
-    currentMap;
+    currentMap = {};
     currentNonTileEvents = {};
     currentPlayer;
 
@@ -27,8 +27,7 @@ class GameManager {
             throw Error(ERRORS.USER_NOT_IN_GAME);
         }
 
-        if (this.currentMap) {
-            console.log(this.currentMap);
+        if (Object.keys(this.currentMap).length !== 0) {
             throw Error(ERRORS.MAP_ALREADY_DEFINED);
         }
         try {
@@ -185,7 +184,7 @@ class GameManager {
         // TODO CLEAR ANY TIMEOUTS THAT HAVE STARTED FOR CLEANING UP EVENTS TAKING PLACE
 
         this.currentNonTileEvents = {};
-        this.currentMap;
+        this.currentMap = {};
         this.currentPlayer = null;
         this.startMatchIfReady(Queue.getInstance());
     }
