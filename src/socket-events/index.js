@@ -39,7 +39,6 @@ const socketHandler = async (socket, redisClient, gameManager) => {
                     path: ["isInGame"]
                 })
             ) {
-                console.log(data);
                 gameManager.triggerNonBlockEvent(data);
             }
         });
