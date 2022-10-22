@@ -7,7 +7,21 @@ const tools = {
         name: "Spawn Point",
         dimensions: { width: 1, height: 1 },
         max: 1,
-        min: 1
+        min: 1,
+        category: "compulsory",
+        description: "The point where the player initially spawns"
+    },
+    Key: {
+        tileStyle: {
+            colour: "gold",
+            textColour: "white"
+        },
+        dimensions: { width: 1, height: 1 },
+        max: 1,
+        min: 1,
+        category: "compulsory",
+        description:
+            "The key that the player is looking for, this can be placed ontop of other items, make sure to hide it well!"
     },
     Wall: {
         tileStyle: {
