@@ -2,24 +2,35 @@ import { ERRORS } from "../consts";
 import SOCKET_EVENTS from "../SOCKET_EVENTS";
 import tools from "../tools";
 import gameEvents from "../game-events";
+import Queue from "../queue";
 
 class GameManager {
     unitySocket;
-    currentMap = {};
+    currentMap;
     currentNonTileEvents = {};
+    currentPlayer;
 
     redisClient;
+    ioRef;
 
-    constructor(redisClient) {
+    constructor(redisClient, ioRef) {
         this.redisClient = redisClient;
+        this.ioRef = ioRef;
     }
 
     setUnitySocket(unitySocket) {
         this.unitySocket = unitySocket;
     }
 
-    setMap(map) {
-        this.currentMap = {};
+    setMap(clientId, map) {
+        if (clientId !== this.currentPlayer.clientId || !clientId) {
+            throw Error(ERRORS.USER_NOT_IN_GAME);
+        }
+
+        if (this.currentMap) {
+            console.log(this.currentMap);
+            throw Error(ERRORS.MAP_ALREADY_DEFINED);
+        }
         try {
             if (this.unitySocket) {
                 this.unitySocket.emit(SOCKET_EVENTS.MAP_UPDATE, map);
@@ -29,6 +40,10 @@ class GameManager {
         } catch (e) {
             console.log(`Could not send message to unity ${e.message}`);
             throw Error(ERRORS.NO_UNITY_CLIENT);
+        }
+
+        if (!map) {
+            throw Error(ERRORS.NULL_MAP);
         }
 
         map.forEach((col, colNum) => {
@@ -54,7 +69,11 @@ class GameManager {
         });
     }
 
-    triggerEvent(identifier) {
+    triggerEvent(clientId, identifier) {
+        if (clientId !== this.currentPlayer.clientId || !clientId) {
+            return;
+        }
+
         const tile = this.currentMap[identifier];
         if (tile?.triggerable) {
             if (this.unitySocket) {
@@ -74,6 +93,7 @@ class GameManager {
             }
             tile.triggerable = false;
             setTimeout(() => {
+                // if the map has reset this will throw errors
                 try {
                     this.currentMap[identifier].triggerable = true; // set back to triggerable
                 } catch (e) {
@@ -87,8 +107,10 @@ class GameManager {
         }
     }
 
-    triggerNonBlockEvent(data) {
-        // TODO check if the user is allowed to perform this (e.g. is there still a cooldown taking place)
+    triggerNonBlockEvent(clientId, data) {
+        if (clientId !== this.currentPlayer.clientId || !clientId) {
+            return;
+        }
         const key = data?.key;
 
         if (!gameEvents[key]) {
@@ -122,6 +144,50 @@ class GameManager {
             console.log(e.message);
             console.log("Failed to emit event to unity client");
         }
+    }
+
+    startMatchIfReady(queue) {
+        console.log("attempting to start");
+
+        if (this.isMatchInProgress()) {
+            // match is in progress
+            return;
+        }
+
+        const newPlayer = queue.getNext();
+
+        if (!newPlayer) {
+            return; // there is no one in the queue ready to play
+        }
+
+        this.startGame(newPlayer[0]);
+    }
+
+    isMatchInProgress() {
+        return !!this.currentPlayer;
+    }
+
+    async startGame(newPlayer) {
+        console.log("starting");
+        console.log(newPlayer);
+        this.currentPlayer = newPlayer;
+        this.ioRef.to(newPlayer.socketId).emit(SOCKET_EVENTS.GAME_STARTING);
+        // await this.redisClient.json.set(newPlayer.clientId, `$.isInGame`, true);
+    }
+
+    async endGame() {
+        // await this.redisClient.json.set(
+        //     this.currentPlayerId,
+        //     `$.isInGame`,
+        //     false
+        // );
+
+        // TODO CLEAR ANY TIMEOUTS THAT HAVE STARTED FOR CLEANING UP EVENTS TAKING PLACE
+
+        this.currentNonTileEvents = {};
+        this.currentMap;
+        this.currentPlayer = null;
+        this.startMatchIfReady(Queue.getInstance());
     }
 }
 

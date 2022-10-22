@@ -54,15 +54,12 @@ export default (app, gameManager, redisClient, serialHandler) => {
     app.post("/submit", async (req, res) => {
         try {
             const clientId = getClientIdFromRequest(req);
-            await redisClient.json.set(clientId, `$.isInGame`, true);
+            await gameManager.setMap(clientId, req.body);
         } catch (e) {
-            console.log(e);
+            throw e;
+            console.log(`Failed on submit endpoint ${e.message}`);
             res.status(403).send();
             return;
-        }
-
-        if (gameManager.unitySocket) {
-            gameManager.setMap(req.body);
         }
         res.status(200).send();
     });

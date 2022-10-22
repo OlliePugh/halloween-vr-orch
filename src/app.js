@@ -6,13 +6,14 @@ import socketHandshakeSetup from "./socket-events";
 import routing from "./routing";
 import { Server } from "socket.io";
 import config from "./config";
+import Queue from "./queue";
+import broadcastQueueUpdate from "./socket-events/broadcast-queue-update";
 
 const app = express();
 const server = http.createServer(app);
 
 app.set("trust proxy", 1); // trust first proxy
 
-const gameManager = Factory.createGameManager();
 const io = new Server(server, {
     cors: {
         origin: "http://dev.olliepugh.com:3000",
@@ -27,14 +28,26 @@ io.on("connection", async (socket) => {
         gameManager.setUnitySocket(socket);
         console.log("Unity Client Connected");
     }
-    socketHandshakeSetup(io, socket, redisClient, gameManager);
+    socketHandshakeSetup(io, socket, redisClient, gameManager, queue);
 });
 
+let gameManager;
 let redisClient;
 let serialHandler;
 
+const queue = new Queue({
+    // onAdd: (user) => {
+    //     io.sockets.to(user.socketId).emit(SOCKET_EVENTS.JOINED_QUEUE);
+    // },
+    onChange: () => {
+        broadcastQueueUpdate(queue, io);
+        gameManager.startMatchIfReady(queue);
+    }
+});
+
 server.listen(8080, async () => {
     redisClient = await Factory.createRedisClient();
+    gameManager = await Factory.createGameManager(io);
     serialHandler = Factory.createSerialHandler(
         { path: config.port, baudRate: config.baudRate },
         true

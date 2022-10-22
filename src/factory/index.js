@@ -2,6 +2,7 @@ import GameManager from "../game-manager";
 import { ReadlineParser, SerialPort } from "serialport";
 import * as redis from "redis";
 import SerialHandler from "../serial-handler";
+import { ERRORS } from "../consts";
 
 class Factory {
     static instances = {};
@@ -10,13 +11,18 @@ class Factory {
         throw new TypeError("Abstract Class");
     }
 
-    static createGameManager() {
+    static async createGameManager(ioRef = undefined) {
         if (this.instances.gameManager) {
             // only ever create one instance
             return this.instances.gameManager;
         }
-        const redisClient = this.createRedisClient();
-        const gameManager = new GameManager(redisClient);
+
+        if (!ioRef) {
+            throw Error(ERRORS.FACTORY_ERROR);
+        }
+
+        const redisClient = await this.createRedisClient();
+        const gameManager = new GameManager(redisClient, ioRef);
         this.instances.gameManager = gameManager;
         return gameManager;
     }

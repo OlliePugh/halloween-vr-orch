@@ -1,7 +1,11 @@
 export const ERRORS = {
     NO_UNITY_CLIENT: "no_unity_client",
     MISSING_CLIENT_ID: "no_client_id",
-    SOCKET_ID_NOT_IN_SESSION: "socket_id_not_in_session"
+    SOCKET_ID_NOT_IN_SESSION: "socket_id_not_in_session",
+    NULL_MAP: "null_map",
+    FACTORY_ERROR: "factory_error",
+    USER_NOT_IN_GAME: "user_not_in_game",
+    MAP_ALREADY_DEFINED: "map_already_defined"
 };
 
 export default {
