@@ -8,6 +8,7 @@ class GameManager {
     unitySocket;
     currentMap = {};
     currentNonTileEvents = {};
+    gameTimeouts = [];
     currentPlayer;
 
     redisClient;
@@ -20,9 +21,15 @@ class GameManager {
 
     setUnitySocket(unitySocket) {
         this.unitySocket = unitySocket;
+        unitySocket.on(SOCKET_EVENTS.GAME_READY, () => {
+            this.ioRef
+                .to(this.currentPlayer?.socketId)
+                .emit(SOCKET_EVENTS.GAME_READY); // send the current player the ready event
+        });
     }
 
     setMap(clientId, map) {
+        // TODO ARE THESE HANDLED??
         if (clientId !== this.currentPlayer.clientId || !clientId) {
             throw Error(ERRORS.USER_NOT_IN_GAME);
         }
@@ -91,16 +98,18 @@ class GameManager {
                 }
             }
             tile.triggerable = false;
-            setTimeout(() => {
-                // if the map has reset this will throw errors
-                try {
-                    this.currentMap[identifier].triggerable = true; // set back to triggerable
-                } catch (e) {
-                    console.log(
-                        `Could not set tile back to triggerable ${e.message}`
-                    );
-                }
-            }, tile.frequency * 1000);
+            this.gameTimeouts.push(
+                setTimeout(() => {
+                    // if the map has reset this will throw errors
+                    try {
+                        this.currentMap[identifier].triggerable = true; // set back to triggerable
+                    } catch (e) {
+                        console.log(
+                            `Could not set tile back to triggerable ${e.message}`
+                        );
+                    }
+                }, tile.frequency * 1000)
+            );
         } else {
             console.log("Tile is not triggerable");
         }
@@ -130,15 +139,17 @@ class GameManager {
             const toSend = { ...event, key, location: data.location };
             this.currentNonTileEvents[key] = toSend;
             this.unitySocket.emit(SOCKET_EVENTS.NONBLOCK_EVENT, toSend);
-            setTimeout(() => {
-                try {
-                    delete this.currentNonTileEvents[key]; // set back to triggerable
-                } catch (e) {
-                    console.log(
-                        `Could not remove currently running non tile event ${e.message}`
-                    );
-                }
-            }, toSend.frequency * 1000);
+            this.gameTimeouts.push(
+                setTimeout(() => {
+                    try {
+                        delete this.currentNonTileEvents[key]; // set back to triggerable
+                    } catch (e) {
+                        console.log(
+                            `Could not remove currently running non tile event ${e.message}`
+                        );
+                    }
+                }, toSend.frequency * 1000)
+            );
         } catch (e) {
             console.log(e.message);
             console.log("Failed to emit event to unity client");
@@ -174,14 +185,21 @@ class GameManager {
         // await this.redisClient.json.set(newPlayer.clientId, `$.isInGame`, true);
     }
 
-    async endGame() {
-        // await this.redisClient.json.set(
-        //     this.currentPlayerId,
-        //     `$.isInGame`,
-        //     false
-        // );
-
+    async endGame({ informUnity = true } = {}) {
         // TODO CLEAR ANY TIMEOUTS THAT HAVE STARTED FOR CLEANING UP EVENTS TAKING PLACE
+
+        if (this.unitySocket && informUnity) {
+            // inform the unity client that the game has ended
+            this.unitySocket.emit(SOCKET_EVENTS.END_GAME);
+        } else {
+            throw Error(ERRORS.NO_UNITY_CLIENT); // TODO HANDLE THIS
+        }
+
+        const totalTimeouts = this.gameTimeouts.length;
+        for (let i = 0; i < totalTimeouts; i++) {
+            // clear all timeouts
+            clearTimeout(this.gameTimeouts.shift());
+        }
 
         this.currentNonTileEvents = {};
         this.currentMap = {};
