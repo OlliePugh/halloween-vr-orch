@@ -8,6 +8,13 @@ export const ERRORS = {
     MAP_ALREADY_DEFINED: "map_already_defined"
 };
 
+export const END_GAME_MESSAGES = {
+    key_collected:
+        "Ollie got the key! Better luck next time!\nThanks for playing!",
+    player_killed:
+        "You Win! Ollie got caught by the pumpkin monster (Patrick)\nThanks for playing!"
+};
+
 export default {
     CLIENT_COOKIE_KEY: "client_id",
     ADMIN_COOKIE_KEY: "admin_id",

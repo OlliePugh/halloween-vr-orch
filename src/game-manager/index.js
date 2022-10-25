@@ -3,6 +3,7 @@ import SOCKET_EVENTS from "../SOCKET_EVENTS";
 import tools from "../tools";
 import gameEvents from "../game-events";
 import Queue from "../queue";
+import { END_GAME_MESSAGES } from "../consts";
 
 class GameManager {
     unitySocket;
@@ -25,6 +26,13 @@ class GameManager {
             this.ioRef
                 .to(this.currentPlayer?.socketId)
                 .emit(SOCKET_EVENTS.GAME_READY); // send the current player the ready event
+        });
+        unitySocket.on(SOCKET_EVENTS.END_GAME, (message) => {
+            const convertedMessage =
+                END_GAME_MESSAGES?.[message] || "Game Over";
+            this.ioRef
+                .to(this.currentPlayer?.socketId)
+                .emit(SOCKET_EVENTS.END_GAME, convertedMessage); // send the current player the ready event
         });
     }
 
@@ -157,8 +165,6 @@ class GameManager {
     }
 
     startMatchIfReady(queue) {
-        console.log("attempting to start");
-
         if (this.isMatchInProgress()) {
             // match is in progress
             return;
