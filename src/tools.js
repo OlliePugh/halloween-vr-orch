@@ -20,8 +20,9 @@ const tools = {
         max: 1,
         min: 1,
         category: "compulsory",
+        shelfPlaced: true,
         description:
-            "The key that the player is looking for, this can be placed ontop of other items, make sure to hide it well!"
+            "The key that the player is looking for, this can be placed on top of other items, make sure to hide it well!"
     },
     Wall: {
         tileStyle: {
@@ -35,7 +36,8 @@ const tools = {
             colour: "green"
         },
         dimensions: { width: 2, height: 2 },
-        category: "Dining Room"
+        category: "Dining Room",
+        hasShelf: true
     },
     WallWithPainting: {
         name: "Wall With Painting",
@@ -65,7 +67,8 @@ const tools = {
             colour: "blue"
         },
         dimensions: { width: 1, height: 2 },
-        category: "Bedroom"
+        category: "Bedroom",
+        hasShelf: true
     },
     BedsideTable: {
         name: "Bedside Table",
@@ -73,7 +76,8 @@ const tools = {
             colour: "yellow"
         },
         dimensions: { width: 1, height: 1 },
-        category: "Bedroom"
+        category: "Bedroom",
+        hasShelf: true
     },
     Wardrobe: {
         tileStyle: {
@@ -91,7 +95,8 @@ const tools = {
         interaction: {
             frequency: 30,
             duration: 2
-        }
+        },
+        hasShelf: true
     },
     Fridge: {
         tileStyle: {
@@ -105,7 +110,8 @@ const tools = {
             colour: "orange"
         },
         dimensions: { width: 1, height: 1 },
-        category: "Kitchen"
+        category: "Kitchen",
+        hasShelf: true
     },
     CoffeeTable: {
         name: "Coffee Table",
@@ -114,21 +120,24 @@ const tools = {
             textColour: "white"
         },
         dimensions: { width: 2, height: 1 },
-        category: "Living Room"
+        category: "Living Room",
+        hasShelf: true
     },
     Bath: {
         tileStyle: {
             colour: "grey"
         },
         dimensions: { width: 4, height: 2 },
-        category: "Bathroom"
+        category: "Bathroom",
+        hasShelf: true
     },
     Sink: {
         tileStyle: {
             colour: "blue"
         },
         dimensions: { width: 2, height: 1 },
-        category: "Bathroom"
+        category: "Bathroom",
+        hasShelf: true
     },
     Toilet: {
         tileStyle: {
@@ -136,7 +145,8 @@ const tools = {
             textColour: "white"
         },
         dimensions: { width: 1, height: 1 },
-        category: "Bathroom"
+        category: "Bathroom",
+        hasShelf: true
     },
     Sofa: {
         tileStyle: {
@@ -144,7 +154,8 @@ const tools = {
             textColour: "white"
         },
         dimensions: { width: 4, height: 1 },
-        category: "Living Room"
+        category: "Living Room",
+        hasShelf: true
     }
 };
 
