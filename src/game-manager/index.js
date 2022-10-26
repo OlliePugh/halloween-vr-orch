@@ -11,6 +11,7 @@ class GameManager {
     currentNonTileEvents = {};
     gameTimeouts = [];
     currentPlayer;
+    unityPlayerLocation;
 
     redisClient;
     ioRef;
@@ -34,6 +35,17 @@ class GameManager {
                 .to(this.currentPlayer?.socketId)
                 .emit(SOCKET_EVENTS.END_GAME, convertedMessage); // send the current player the ready event
         });
+        unitySocket.on(SOCKET_EVENTS.ENTITY_LOCATION, ({ key, location }) => {
+            if (key === "player") {
+                this.unityPlayerLocation = location;
+            }
+            this.ioRef
+                .to(this.currentPlayer?.socketId)
+                .emit(`${key}_location`, location); // send the current player the ready event
+        });
+        // unitySocket.onAny((m) => {
+        //     console.log(m);
+        // });
     }
 
     setMap(clientId, map) {
@@ -210,6 +222,7 @@ class GameManager {
         this.currentNonTileEvents = {};
         this.currentMap = {};
         this.currentPlayer = null;
+        this.unityPlayerLocation = null;
         this.startMatchIfReady(Queue.getInstance());
     }
 }
