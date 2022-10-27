@@ -10,5 +10,9 @@ export default {
     GAME_STARTING: "game_starting",
     GAME_READY: "game_ready",
     END_GAME: "end_game",
-    ENTITY_LOCATION: "entity_location"
+    ENTITY_LOCATION: "entity_location",
+    VALIDATE_MAP: "validate_map",
+    JOIN_QUEUE: "join_queue",
+    HANDSHAKE_COMPLETE: "handshake_complete",
+    MAP_VALIDITY: "map_validity"
 };

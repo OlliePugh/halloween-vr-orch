@@ -8,6 +8,8 @@ import { Server } from "socket.io";
 import config from "./config";
 import Queue from "./queue";
 import broadcastQueueUpdate from "./socket-events/broadcast-queue-update";
+import fs from "fs";
+import { importPKCS8, importSPKI } from "jose";
 
 const app = express();
 const server = http.createServer(app);
@@ -23,17 +25,27 @@ const io = new Server(server, {
     }
 });
 
+let gameManager;
+let redisClient;
+let serialHandler;
+
+let privateKey;
+let publicKey;
+
 io.on("connection", async (socket) => {
     if (socket.handshake.query?.token === secrets.unityKey) {
         gameManager.setUnitySocket(socket);
         console.log("Unity Client Connected");
     }
-    socketHandshakeSetup(io, socket, redisClient, gameManager, queue);
+    socketHandshakeSetup(
+        io,
+        socket,
+        redisClient,
+        gameManager,
+        queue,
+        privateKey
+    );
 });
-
-let gameManager;
-let redisClient;
-let serialHandler;
 
 const queue = new Queue({
     // onAdd: (user) => {
@@ -52,6 +64,11 @@ server.listen(8080, async () => {
         { path: config.port, baudRate: config.baudRate },
         true
     );
-    routing(app, gameManager, redisClient, serialHandler);
+
+    const privateKeyContents = fs.readFileSync("keys/private.pem", "utf-8");
+    privateKey = await importPKCS8(privateKeyContents, "RS256");
+    const publicKeyContents = fs.readFileSync("keys/public_key.pem", "utf-8");
+    publicKey = await importSPKI(publicKeyContents, "RS256");
+    routing(app, gameManager, redisClient, serialHandler, publicKey);
     console.log("HTTP Listening");
 });

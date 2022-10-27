@@ -9,8 +9,9 @@ import tools from "./tools";
 import events from "./game-events";
 import cors from "cors";
 import express from "express";
+import { compactVerify } from "jose";
 
-export default (app, gameManager, redisClient, serialHandler) => {
+export default (app, gameManager, redisClient, serialHandler, publicKey) => {
     app.use(cookies());
     app.use(
         cors({
@@ -54,9 +55,16 @@ export default (app, gameManager, redisClient, serialHandler) => {
     app.post("/submit", async (req, res) => {
         try {
             const clientId = getClientIdFromRequest(req);
-            await gameManager.setMap(clientId, req.body);
+            // has the map been validated?
+            const { payload, _ } = await compactVerify(
+                req.body.signature,
+                publicKey
+            );
+            const decodedPayload = JSON.parse(
+                new TextDecoder().decode(payload)
+            );
+            await gameManager.setMap(clientId, decodedPayload.map);
         } catch (e) {
-            throw e;
             console.log(`Failed on submit endpoint ${e.message}`);
             res.status(403).send();
             return;

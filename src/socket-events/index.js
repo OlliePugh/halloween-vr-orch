@@ -1,5 +1,6 @@
 import SOCKET_EVENTS from "../SOCKET_EVENTS";
 import { getClientIdFromSocket } from "../utils";
+import { SignJWT } from "jose";
 
 const requiresClientId = (socket, data, disconnect, callback) => {
     let clientId;
@@ -19,7 +20,13 @@ const requiresClientId = (socket, data, disconnect, callback) => {
     }
 };
 
-const socketHandler = async (socket, redisClient, gameManager, queue) => {
+const socketHandler = async (
+    socket,
+    redisClient,
+    gameManager,
+    queue,
+    privateKey
+) => {
     // MOVE THESE TO GAME SOCKETS
     socket.on(SOCKET_EVENTS.TRIGGER_EVENT, (data) => {
         requiresClientId(socket, data, true, async (clientId, identifier) => {
@@ -41,9 +48,47 @@ const socketHandler = async (socket, redisClient, gameManager, queue) => {
             }
         });
     });
+
+    socket.on(SOCKET_EVENTS.VALIDATE_MAP, async (map) => {
+        const valid = true;
+        let jwt;
+        if (valid) {
+            jwt = await new SignJWT({ map })
+                .setProtectedHeader({ alg: "RS256" })
+                .setIssuedAt()
+                .setIssuer("olliepugh.com")
+                .setExpirationTime("6h")
+                .sign(privateKey);
+            socket.emit(SOCKET_EVENTS.MAP_VALIDITY, {
+                result: true,
+                message: "LGTM",
+                body: jwt
+            });
+        } else {
+            socket.emit(SOCKET_EVENTS.MAP_VALIDITY, {
+                result: false,
+                message: "Missing something"
+            });
+        }
+    });
+
+    socket.on(SOCKET_EVENTS.JOIN_QUEUE, (data) => {
+        requiresClientId(socket, data, true, async (clientId, _) => {
+            queue.add({ clientId, socketId: socket.id }, false); // add the user to the queue
+        });
+    });
+
+    socket.emit(SOCKET_EVENTS.HANDSHAKE_COMPLETE);
 };
 
-const socketHandshakeSetup = (io, socket, redisClient, gameManager, queue) => {
+const socketHandshakeSetup = (
+    io,
+    socket,
+    redisClient,
+    gameManager,
+    queue,
+    privateKey
+) => {
     socket.on(SOCKET_EVENTS.HANDSHAKE, () => {
         requiresClientId(socket, null, false, async (clientId) => {
             // this requires a client id
@@ -69,7 +114,8 @@ const socketHandshakeSetup = (io, socket, redisClient, gameManager, queue) => {
                     redisClient,
                     clientId,
                     gameManager,
-                    queue
+                    queue,
+                    privateKey
                 );
             }
         });
@@ -99,12 +145,12 @@ const setPrimarySocket = async (
     redisClient,
     clientId,
     gameManager,
-    queue
+    queue,
+    privateKey
 ) => {
     try {
         await redisClient.json.set(clientId, `$.socket`, socket.id);
-        socketHandler(socket, redisClient, gameManager, queue);
-        queue.add({ clientId, socketId: socket.id }, false); // add the user to the queue
+        socketHandler(socket, redisClient, gameManager, queue, privateKey);
     } catch (e) {
         console.log(`Failed to update socket ${e.message}`);
     }
