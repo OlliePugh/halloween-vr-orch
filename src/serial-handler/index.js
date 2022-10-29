@@ -19,9 +19,9 @@ export default class SerialHandler {
     }
 
     connect() {
-        console.log(
-            `Attempting to connect to ${this.serialPort.path} with baud rate ${this.serialPort.baudRate}`
-        );
+        // console.log(
+        //     `Attempting to connect to ${this.serialPort.path} with baud rate ${this.serialPort.baudRate}`
+        // );
         this.serialPort.pipe(this.parser);
 
         this.serialPort.on("open", this.onOpen);
@@ -62,7 +62,7 @@ export default class SerialHandler {
     }
 
     reconnect() {
-        console.log(`Attempting to reconnect to ${this.serialPort.path}`);
+        // console.log(`Attempting to reconnect to ${this.serialPort.path}`);
         if (!this.connected) {
             this.serialPort.open();
         }

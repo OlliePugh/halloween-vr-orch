@@ -11,7 +11,7 @@ import cors from "cors";
 import express from "express";
 import { compactVerify } from "jose";
 
-export default (app, gameManager, redisClient, serialHandler, publicKey) => {
+export default (app, gameManager, redisClient, publicKey) => {
     app.use(cookies());
     app.use(
         cors({
@@ -48,8 +48,12 @@ export default (app, gameManager, redisClient, serialHandler, publicKey) => {
         res.send(events);
     });
 
+    app.post("/bpm", (req, res) => {
+        gameManager.setBpm(req.body.bpm);
+    });
+
     app.get("/bpm", (req, res) => {
-        res.send(`${serialHandler.state.bpm}`);
+        res.send(`${gameManager.bpm}`);
     });
 
     app.post("/submit", async (req, res) => {

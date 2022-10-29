@@ -12,6 +12,7 @@ class GameManager {
     gameTimeouts = [];
     currentPlayer;
     unityPlayerLocation;
+    bpm = 50;
 
     redisClient;
     ioRef;
@@ -19,6 +20,11 @@ class GameManager {
     constructor(redisClient, ioRef) {
         this.redisClient = redisClient;
         this.ioRef = ioRef;
+    }
+
+    setBpm(bpm) {
+        console.log(`Updating BPM to ${bpm}`);
+        this.bpm = bpm;
     }
 
     setUnitySocket(unitySocket) {

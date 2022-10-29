@@ -5,7 +5,12 @@ export const ERRORS = {
     NULL_MAP: "null_map",
     FACTORY_ERROR: "factory_error",
     USER_NOT_IN_GAME: "user_not_in_game",
-    MAP_ALREADY_DEFINED: "map_already_defined"
+    MAP_ALREADY_DEFINED: "map_already_defined",
+    NO_AVAILABLE_SHELF: "no_available_shelf",
+    NOT_SHELF_PLACEABLE: "not_shelf_placeable",
+    MIN_NOT_SATISFIED: "min_not_satisfied",
+    MAX_NOT_SATISFIED: "max_not_satisfied",
+    MISSING_COMPULSORY: "missing_compulsory"
 };
 
 export const END_GAME_MESSAGES = {

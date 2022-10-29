@@ -27,7 +27,7 @@ const io = new Server(server, {
 
 let gameManager;
 let redisClient;
-let serialHandler;
+// let serialHandler;
 
 let privateKey;
 let publicKey;
@@ -60,15 +60,15 @@ const queue = new Queue({
 server.listen(8080, async () => {
     redisClient = await Factory.createRedisClient();
     gameManager = await Factory.createGameManager(io);
-    serialHandler = Factory.createSerialHandler(
-        { path: config.port, baudRate: config.baudRate },
-        true
-    );
+    // serialHandler = Factory.createSerialHandler(
+    //     { path: config.port, baudRate: config.baudRate },
+    //     true
+    // );
 
     const privateKeyContents = fs.readFileSync("keys/private.pem", "utf-8");
     privateKey = await importPKCS8(privateKeyContents, "RS256");
     const publicKeyContents = fs.readFileSync("keys/public_key.pem", "utf-8");
     publicKey = await importSPKI(publicKeyContents, "RS256");
-    routing(app, gameManager, redisClient, serialHandler, publicKey);
+    routing(app, gameManager, redisClient, publicKey);
     console.log("HTTP Listening");
 });

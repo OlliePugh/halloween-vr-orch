@@ -1,6 +1,7 @@
 import SOCKET_EVENTS from "../SOCKET_EVENTS";
 import { getClientIdFromSocket } from "../utils";
 import { SignJWT } from "jose";
+import isMapValid from "../map-validator";
 
 const requiresClientId = (socket, data, disconnect, callback) => {
     let clientId;
@@ -50,20 +51,35 @@ const socketHandler = async (
     });
 
     socket.on(SOCKET_EVENTS.VALIDATE_MAP, async (map) => {
-        const valid = true;
+        let valid = true;
+        try {
+            isMapValid(map);
+        } catch (e) {
+            console.log("Map failed validation");
+            console.log(e.message);
+            valid = false;
+        }
         let jwt;
         if (valid) {
-            jwt = await new SignJWT({ map })
-                .setProtectedHeader({ alg: "RS256" })
-                .setIssuedAt()
-                .setIssuer("olliepugh.com")
-                .setExpirationTime("6h")
-                .sign(privateKey);
-            socket.emit(SOCKET_EVENTS.MAP_VALIDITY, {
-                result: true,
-                message: "LGTM",
-                body: jwt
-            });
+            try {
+                jwt = await new SignJWT({ map })
+                    .setProtectedHeader({ alg: "RS256" })
+                    .setIssuedAt()
+                    .setIssuer("olliepugh.com")
+                    .setExpirationTime("6h")
+                    .sign(privateKey);
+                socket.emit(SOCKET_EVENTS.MAP_VALIDITY, {
+                    result: true,
+                    message: "LGTM",
+                    body: jwt
+                });
+            } catch (e) {
+                console.log(e);
+                socket.emit(SOCKET_EVENTS.MAP_VALIDITY, {
+                    result: false,
+                    message: "Server error - try again later"
+                });
+            }
         } else {
             socket.emit(SOCKET_EVENTS.MAP_VALIDITY, {
                 result: false,
