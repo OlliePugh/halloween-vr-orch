@@ -18,7 +18,7 @@ app.set("trust proxy", 1); // trust first proxy
 
 const io = new Server(server, {
     cors: {
-        origin: "http://dev.olliepugh.com:3000",
+        origin: config.corsAddresses,
         methods: ["GET", "POST"],
         allowedHeaders: ["connect.sid"],
         credentials: true
@@ -57,7 +57,7 @@ const queue = new Queue({
     }
 });
 
-server.listen(8080, async () => {
+server.listen(config.hostedPort, async () => {
     redisClient = await Factory.createRedisClient();
     gameManager = await Factory.createGameManager(io);
     // serialHandler = Factory.createSerialHandler(

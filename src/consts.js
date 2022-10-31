@@ -10,7 +10,8 @@ export const ERRORS = {
     NOT_SHELF_PLACEABLE: "not_shelf_placeable",
     MIN_NOT_SATISFIED: "min_not_satisfied",
     MAX_NOT_SATISFIED: "max_not_satisfied",
-    MISSING_COMPULSORY: "missing_compulsory"
+    MISSING_COMPULSORY: "missing_compulsory",
+    KEY_NOT_ACCESSABLE: "key_not_accessable"
 };
 
 export const END_GAME_MESSAGES = {

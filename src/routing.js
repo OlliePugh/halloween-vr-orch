@@ -10,12 +10,14 @@ import events from "./game-events";
 import cors from "cors";
 import express from "express";
 import { compactVerify } from "jose";
+import config from "./config";
+import secrets from "./secrets";
 
 export default (app, gameManager, redisClient, publicKey) => {
     app.use(cookies());
     app.use(
         cors({
-            origin: "http://dev.olliepugh.com:3000",
+            origin: config.corsAddresses,
             credentials: true,
             optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
         })
@@ -37,7 +39,7 @@ export default (app, gameManager, redisClient, publicKey) => {
     });
 
     app.get("/start-session", (req, res) => {
-        res.status(200).send(); // this is used to get a client id
+        res.sendStatus(200); // this is used to get a client id
     });
 
     app.get("/tools", (req, res) => {
@@ -49,7 +51,12 @@ export default (app, gameManager, redisClient, publicKey) => {
     });
 
     app.post("/bpm", (req, res) => {
+        if (req.headers?.authorization !== secrets.watchKey) {
+            res.sendStatus(403);
+            return;
+        }
         gameManager.setBpm(req.body.bpm);
+        res.sendStatus(200);
     });
 
     app.get("/bpm", (req, res) => {
@@ -70,9 +77,9 @@ export default (app, gameManager, redisClient, publicKey) => {
             await gameManager.setMap(clientId, decodedPayload.map);
         } catch (e) {
             console.log(`Failed on submit endpoint ${e.message}`);
-            res.status(403).send();
+            res.sendStatus(403);
             return;
         }
-        res.status(200).send();
+        res.sendStatus(200);
     });
 };
