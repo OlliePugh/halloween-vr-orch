@@ -212,11 +212,11 @@ class GameManager {
     async endGame({ informUnity = true } = {}) {
         // TODO CLEAR ANY TIMEOUTS THAT HAVE STARTED FOR CLEANING UP EVENTS TAKING PLACE
 
-        if (this.unitySocket && informUnity) {
-            // inform the unity client that the game has ended
-            this.unitySocket.emit(SOCKET_EVENTS.END_GAME);
-        } else {
-            throw Error(ERRORS.NO_UNITY_CLIENT); // TODO HANDLE THIS
+        if (informUnity) {
+            if (this.unitySocket) {
+                // inform the unity client that the game has ended
+                this.unitySocket.emit(SOCKET_EVENTS.END_GAME);
+            }
         }
 
         const totalTimeouts = this.gameTimeouts.length;

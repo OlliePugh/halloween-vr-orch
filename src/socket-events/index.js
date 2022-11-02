@@ -58,32 +58,32 @@ const socketHandler = async (
             console.log("Map failed validation");
             console.log(e.message);
             valid = false;
-        }
-        let jwt;
-        if (valid) {
-            try {
-                jwt = await new SignJWT({ map })
-                    .setProtectedHeader({ alg: "RS256" })
-                    .setIssuedAt()
-                    .setIssuer("olliepugh.com")
-                    .setExpirationTime("6h")
-                    .sign(privateKey);
-                socket.emit(SOCKET_EVENTS.MAP_VALIDITY, {
-                    result: true,
-                    message: "LGTM",
-                    body: jwt
-                });
-            } catch (e) {
-                console.log(e);
-                socket.emit(SOCKET_EVENTS.MAP_VALIDITY, {
-                    result: false,
-                    message: "Server error - try again later"
-                });
-            }
-        } else {
+
             socket.emit(SOCKET_EVENTS.MAP_VALIDITY, {
                 result: false,
-                message: "Missing something"
+                message: e.message
+            });
+            return; // exit now
+        }
+
+        let jwt;
+        try {
+            jwt = await new SignJWT({ map })
+                .setProtectedHeader({ alg: "RS256" })
+                .setIssuedAt()
+                .setIssuer("olliepugh.com")
+                .setExpirationTime("6h")
+                .sign(privateKey);
+            socket.emit(SOCKET_EVENTS.MAP_VALIDITY, {
+                result: true,
+                message: "LGTM",
+                body: jwt
+            });
+        } catch (e) {
+            console.log(e);
+            socket.emit(SOCKET_EVENTS.MAP_VALIDITY, {
+                result: false,
+                message: "Server error - try again later"
             });
         }
     });
