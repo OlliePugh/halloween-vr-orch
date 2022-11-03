@@ -850,6 +850,60 @@ const fakeValidMap2 = [
     ]
 ];
 
+const fakeMapKeyOnShelf = [
+    [
+        {
+            type: {
+                name: "Table with Lamp",
+                tileStyle: {
+                    colour: "green"
+                },
+                dimensions: {
+                    width: 1,
+                    height: 1
+                },
+                interaction: {
+                    frequency: 30,
+                    duration: 2
+                },
+                hasShelf: true,
+                key: "TableWithLamp"
+            },
+            parent: {
+                col: 0,
+                row: 0
+            },
+            rotation: 0,
+            shelfItems: ["Key"]
+        }
+    ],
+    [
+        {
+            type: {
+                tileStyle: {
+                    colour: "black",
+                    textColour: "white"
+                },
+                name: "Spawn Point",
+                dimensions: {
+                    width: 1,
+                    height: 1
+                },
+                max: 1,
+                min: 1,
+                category: "compulsory",
+                description: "The point where the player initially spawns",
+                key: "SpawnPoint"
+            },
+            parent: {
+                col: 1,
+                row: 0
+            },
+            rotation: 0
+        }
+    ]
+];
+
 describe("Map Validator", () => {
     describe("isMapValid", () => {
         it("Should return false for an empty map", () => {
@@ -862,6 +916,9 @@ describe("Map Validator", () => {
 
         it("Should not throw if there is a path between the spawn point and the key", () => {
             expect(() => isMapValid(fakeValidMap2)).not.toThrow();
+        });
+        it("Should not throw if there is a path between the spawn point and the key on a shelf", () => {
+            expect(() => isMapValid(fakeMapKeyOnShelf)).not.toThrow();
         });
     });
 });

@@ -84,7 +84,10 @@ const isKeyNeighbouring = (map, { centralCol, centralRow }, checkedTiles) => {
                     ) {
                         return true;
                     } // therefore check its neighbours
-                } else if (currentNeighbour?.type.key === "Key") {
+                } else if (
+                    currentNeighbour?.type.key === "Key" ||
+                    currentNeighbour?.shelfItems?.includes("Key")
+                ) {
                     // we have found the key therefore there is a path
                     return true;
                 }
